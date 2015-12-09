@@ -15,10 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import data
-import requests
 import json
-from bs4 import BeautifulSoup
 
 from flask import Flask
 from flask import render_template
@@ -26,10 +23,8 @@ from flask import redirect
 from flask import request
 from flask import make_response
 
-url = "https://codein.withgoogle.com/api/program/2015/taskinstance/?status=7"
+
 task_url = "https://codein.withgoogle.com/tasks/{task_id}/"
-url_login = "https://accounts.google.com/ServiceLogin?service=ah&passive=true&continue=https%3A%2F%2Fappengine.google.com%2F_ah%2Fconflogin%3Fcontinue%3Dhttps%3A%2F%2Fcodein.withgoogle.com%2F&ltmpl#identifier"
-url_auth = "https://accounts.google.com/ServiceLoginAuth?service=ah&passive=true&continue=https%3A%2F%2Fappengine.google.com%2F_ah%2Fconflogin%3Fcontinue%3Dhttps%3A%2F%2Fcodein.withgoogle.com%2F&ltmpl#identifier"
 student_model = """<div class="panel panel-primary">
   <div class="panel-heading">{student_name} <span class="badge">{tasks}</span></div>
   <table class="table">
@@ -38,26 +33,7 @@ student_model = """<div class="panel panel-primary">
 </div>"""
 
 
-class SessionGoogle:
-
-    def __init__(self, url_login, url_auth, login, pwd):
-        self.ses = requests.session()
-        login_html = self.ses.get(url_login)
-        soup_login = BeautifulSoup(
-            login_html.content).find('form').find_all('input')
-        dico = {}
-        for u in soup_login:
-            if u.has_attr('value'):
-                dico[u['name']] = u['value']
-        dico['Email'] = login
-        dico['Passwd'] = pwd
-        self.ses.post(url_auth, data=dico)
-
-    def get(self, url):
-        return self.ses.get(url)
-
 app = Flask(__name__)
-session = SessionGoogle(url_login, url_auth, data.user, data.password)
 
 
 @app.route('/')
@@ -69,6 +45,7 @@ def start_index():
 def org_data(orgname):
     html = """
 
+    <title>GCI Leaderboard</title>
     <style>
     .content {
     margin-top: 1%;
@@ -91,8 +68,8 @@ def org_data(orgname):
     <h2> {tasks_count} tasks have been completed by {students_count} students.</h2><br></h1>
     """
 
-    d = session.get(url)
-    tasks = json.loads(d.text)["results"]
+    data = open("sugarlabs_data.json", "r").read()
+    tasks = json.loads(data)["results"]
 
     students = {}
     tasks_by_student = {}
