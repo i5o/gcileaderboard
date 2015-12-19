@@ -20,18 +20,9 @@ import json
 from flask import Flask
 from flask import render_template
 from flask import redirect
-from flask import request
-from flask import make_response
 
 
 task_url = "https://codein.withgoogle.com/tasks/{task_id}/"
-student_model = """<div class="panel panel-primary">
-  <div class="panel-heading">{student_name} <span class="badge">{tasks}</span></div>
-  <table class="table">
-    {tasks_table}
-  </table>
-</div>"""
-
 
 app = Flask(__name__)
 
@@ -43,76 +34,43 @@ def start_index():
 
 @app.route('/org/<orgname>/')
 def org_data(orgname):
-    html = """
-
-    <title>GCI Leaderboard</title>
-    <style>
-    .content {
-    margin-top: 1%;
-    margin-left: 2%;
-    margin-right: 2%;
-    }
-    .badge {
-        float: right;
-    }
-    </style>
-        <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
-        <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css"/>
-
-<div class="content">
-        """
-
-    header = """
-
-    <h1>Sugar Labs<br>
-    <h2> {tasks_count} tasks have been completed by {students_count} students.</h2><br></h1>
-    """
-
-    data = open("sugarlabs_data.json", "r").read()
+    try:
+        data = open(orgname + "_data.json", "r").read()
+    except IOError:
+        return "<h1>Data for org <i>'%s'</i> not found</h1>" % orgname
     tasks = json.loads(data)["results"]
 
-    students = {}
-    tasks_by_student = {}
-    tasks_names_by_student = {}
-    total_tasks = 0
+    last_student_id = 0
+    s_id = {}
+    student_tasks = []
 
     for task in tasks:
-        student_id = task["claimed_by"]["id"]
-        students[student_id] = task["claimed_by"]["display_name"]
+        student_name = task["claimed_by"]["display_name"]
         task_name = task["task_definition"]["name"]
         task_link = task_url.format(task_id=task["task_definition_id"])
 
-        if student_id in tasks_by_student:
-            tasks_by_student[student_id] += 1
+        if student_name in s_id:
+            student_id = s_id[student_name]
+            student_tasks[student_id][0] += 1
+            student_tasks[student_id][2].append([task_name, task_link])
         else:
-            tasks_by_student[student_id] = 1
+            s_id[student_name] = last_student_id
+            student_tasks.append([1, student_name, [[task_name, task_link]]])
+            last_student_id += 1
 
-        if student_id in tasks_names_by_student:
-            tasks_names_by_student[student_id].append([task_name, task_link])
-        else:
-            tasks_names_by_student[student_id] = [[task_name, task_link]]
+    student_tasks = sorted(student_tasks, key=lambda x: x[0], reverse=True)
 
-        total_tasks += 1
+    for key in student_tasks:
+        key = student_tasks.index(key)
+        tasks_ = student_tasks[key][2]
+        sorted_tasks = sorted(tasks_, key=lambda x: x[0], reverse=False)
+        student_tasks[key][2] = sorted_tasks
 
-    html += header.format(tasks_count=total_tasks,
-                          students_count=len(tasks_by_student.keys()))
-    for student in students:
-        prefix = "task"
-        if tasks_by_student[student] > 1:
-            prefix = "tasks"
-
-        tasks_html = ""
-
-        for task in tasks_names_by_student[student]:
-            tasks_html += "\n<tr><td><a href='%s'>%s</a></td></tr>" % (task[
-                                                                       1], task[0])
-
-        student_html = student_model.format(
-            student_name=students[student], tasks="%d %s" %
-            (tasks_by_student[student], prefix), tasks_table=tasks_html)
-        html += student_html
-    return html
-
+    return render_template(
+        'org.html',
+        org_name="Sugar Labs",
+        tasks_count=len(tasks),
+        students=student_tasks)
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000)

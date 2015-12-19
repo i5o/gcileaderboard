@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{{org_name}} leaderboard</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css" />
+    <script src="/static/js/jquery-1.11.3.min.js" /></script>
+    <script src="/static/js/bootstrap.min.js" /></script>
+    <style>
+        .content {
+            margin-top: 1%;
+            margin-left: 2%;
+            margin-right: 2%;
+        }
+
+        .badge {
+            float: right;
+        }
+
+        .panel-heading  {
+            cursor: pointer;
+        }
+
+        .more_icon {
+            margin-right: 1em;
+        }
+
+        .rotate {
+            -moz-transition: all 0.2s linear;
+            -webkit-transition: all 0.2s linear;
+            transition: all 0.2s linear;
+        }
+
+        .rotate.down {
+            -ms-transform: rotate(90deg);
+            -moz-transform: rotate(90deg);
+            -webkit-transform: rotate(90deg);
+            transform: rotate(90deg);
+        }
+
+        .panel-heading a {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <h1>{{org_name}}</h1>
+        <h2>{{tasks_count}} tasks have been completed by {{ students|length }} students.</h2>
+        <br/>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            {% set student_count = 0 %} {% for student in students %} {% set student_count = student_count + 1 %}
+            <div class="panel panel-primary" id="panel{{student_count}}">
+                <div class="panel-heading" data-toggle="collapse" data-icon="{{student_count}}" href="#student{{student_count}}">
+                    <a href="#"><span class="glyphicon glyphicon-chevron-right rotate more_icon" id="moreIcon{{student_count}}"></span></a>
+                    </span>{{ student[1] }} <span class="badge">{{ student[2]|length }} task{% if (student[2]|length > 1) %}s{% endif %}</span>
+                </div>
+                <div id="student{{student_count}}" class="panel-collapse collapse">
+                    <table class="table">
+                        {% for task in student[2] %}
+                        <tr>
+                            <td>
+                                <a href='{{ task[1] }}'>{{ task[0] }}</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <script>
+        $("[data-icon]").click(function() {
+            var icon = "#moreIcon" + $(this).attr('data-icon');
+            $(icon).toggleClass("down");
+        });
+    </script>
+</body>

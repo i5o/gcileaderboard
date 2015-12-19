@@ -15,12 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import time
 import data
 import requests
 from bs4 import BeautifulSoup
 
 
-url = "https://codein.withgoogle.com/api/program/2015/taskinstance/?status=7"
+url = "https://codein.withgoogle.com/api/program/2015/taskinstance/?status=7&page_size=1000"
 url_login = "https://accounts.google.com/ServiceLogin?service=ah&passive=true&continue=https%3A%2F%2Fappengine.google.com%2F_ah%2Fconflogin%3Fcontinue%3Dhttps%3A%2F%2Fcodein.withgoogle.com%2F&ltmpl#identifier"
 url_auth = "https://accounts.google.com/ServiceLoginAuth?service=ah&passive=true&continue=https%3A%2F%2Fappengine.google.com%2F_ah%2Fconflogin%3Fcontinue%3Dhttps%3A%2F%2Fcodein.withgoogle.com%2F&ltmpl#identifier"
 
@@ -43,7 +44,15 @@ class SessionGoogle:
     def get(self, url):
         return self.ses.get(url)
 
-
 session = SessionGoogle(url_login, url_auth, data.user, data.password)
-d = session.get(url)
-open("sugarlabs_data.json", "w").write(u''.join(d.text).encode("utf-8"))
+while True:
+    try:
+        d = session.get(url)
+        open(
+            "sugarlabs_data.json",
+            "w").write(
+            u''.join(
+                d.text).encode("utf-8"))
+        time.sleep(180)
+    except:
+        session = SessionGoogle(url_login, url_auth, data.user, data.password)
