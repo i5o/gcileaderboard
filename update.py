@@ -53,6 +53,7 @@ while True:
             "w").write(
             u''.join(
                 d.text).encode("utf-8"))
+        print "Data updated, sleeping 3m"
         time.sleep(180)
     except:
         session = SessionGoogle(url_login, url_auth, data.user, data.password)
