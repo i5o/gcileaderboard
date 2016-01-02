@@ -26,6 +26,11 @@ task_url = "https://codein.withgoogle.com/tasks/{task_id}/"
 
 app = Flask(__name__)
 
+orgs = {
+    'apertium': "Apertium",
+    'sugarlabs': "SugarLabs"
+}
+
 
 @app.route('/')
 def start_index():
@@ -68,7 +73,7 @@ def org_data(orgname):
 
     return render_template(
         'org.html',
-        org_name="Sugar Labs",
+        org_name=orgs[orgname],
         tasks_count=len(tasks),
         students=student_tasks)
 
