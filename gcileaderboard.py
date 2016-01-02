@@ -34,7 +34,7 @@ orgs = {
 
 @app.route('/')
 def start_index():
-    return redirect('/org/sugarlabs')
+    return render_template("index.html")
 
 
 @app.route('/org/<orgname>/')
