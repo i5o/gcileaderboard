@@ -28,7 +28,10 @@ app = Flask(__name__)
 
 orgs = {
     'apertium': "Apertium",
-    'sugarlabs': "Sugar Labs"
+    'sugarlabs': "Sugar Labs",
+    'drupal': "Drupal",
+    'fossasia': "FOSSAsia",
+    'ubuntu': "Ubuntu"
 }
 
 
@@ -43,6 +46,7 @@ def org_data(orgname):
         data = open(orgname + "_data.json", "r").read()
     except IOError:
         return "<h1>Data for org <i>'%s'</i> not found</h1>" % orgname
+    tasks_count = json.loads(data)["count"]
     tasks = json.loads(data)["results"]
 
     last_student_id = 0
@@ -74,7 +78,7 @@ def org_data(orgname):
     return render_template(
         'org.html',
         org_name=orgs[orgname],
-        tasks_count=len(tasks),
+        tasks_count=tasks_count,
         students=student_tasks)
 
 if __name__ == '__main__':
