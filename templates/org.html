@@ -15,40 +15,85 @@
         body {
             background-color: white;
         }
+
         .content {
             margin-top: 1%;
             margin-left: 2%;
             margin-right: 2%;
         }
+
         .badge {
             float: right;
+            margin-left: 2px;
         }
+
+        .code-badge {
+            width: 15px;
+            height: 15px;
+            background-color: #3366CC;
+            margin-left: 2px;
+        }
+
+        .ui-badge {
+            width: 15px;
+            height: 15px;
+            background-color: #DC3912;
+            margin-left: 2px;
+        }
+
+        .qa-badge {
+            width: 15px;
+            height: 15px;
+            background-color: #109618;
+            margin-left: 2px;
+        }
+
+        .doc-badge {
+            width: 15px;
+            height: 15px;
+            background-color: #FF9900;
+            margin-left: 2px;
+        }
+
+        .outreach-badge {
+            width: 15px;
+            height: 15px;
+            background-color: #990099;
+            margin-left: 2px;
+        }
+
         .panel-heading {
             cursor: pointer;
         }
+
         .more_icon {
             margin-right: 1em;
         }
+
         .rotate {
             -moz-transition: all 0.2s linear;
             -webkit-transition: all 0.2s linear;
             transition: all 0.2s linear;
         }
+
         .rotate.down {
             -ms-transform: rotate(90deg);
             -moz-transform: rotate(90deg);
             -webkit-transform: rotate(90deg);
             transform: rotate(90deg);
         }
+
         .panel-heading a {
             color: white;
             text-decoration: none;
             cursor: pointer;
             outline: none;
         }
+
         #tasksChart {
             z-index: -1;
         }
+
         .panel-group {
             z-index: 1;
         }
@@ -67,11 +112,11 @@
 
         var data = google.visualization.arrayToDataTable([
             ['Tasks\' category', 'Amount of finished tasks'],
-            ['Code', {{ cat_count[0] }}],
-            ['User interface', {{ cat_count[1] }}],
-            ['Documentation', {{ cat_count[2] }}],
-            ['Quality Assurance', {{ cat_count[3] }}],
-            ['Outreach/Research', {{ cat_count[4] }}]
+            ['User interface', {{ cat_count[1] }} ],
+            ['Documentation', {{ cat_count[2] }} ],
+            ['Quality Assurance', {{ cat_count[3] }} ],
+            ['Outreach/Research', {{ cat_count[4] }} ],
+            ['Code', {{ cat_count[0] }} ]
         ]);
 
         var options = {
@@ -83,6 +128,7 @@
                 'width': '100%',
                 'height': '80%'
             },
+            colors: ['#990099', '#109618', '#FF9900','#DC3912', '#3366CC']
         };
 
 
@@ -115,17 +161,34 @@
 
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             {% set student_count = 0 %} {% for student in students %} {% set student_count = student_count + 1 %}
-            <div class="panel panel-primary" id="panel{{student_count}}">
+            <div class="panel panel-success" id="panel{{student_count}}">
                 <div class="panel-heading" data-toggle="collapse" data-icon="{{student_count}}" href="#student{{student_count}}">
                     <a href="#"><span class="glyphicon glyphicon-chevron-right rotate more_icon" id="moreIcon{{student_count}}"></span></a>
-                    </span>{{ student[1] }} <span class="badge">{{ student[2]|length }} task{% if (student[2]|length > 1) %}s{% endif %}</span>
+                    </span>{{ student[1] }}<span class="badge">{{ student[2]|length }} task{% if (student[2]|length > 1) %}s{% endif %}</span><span class="badge" style="background-color: #3366CC; color: white;">{{ student[3][0] }}</span><span class="badge" style="background-color: #DC3912; color: white;">{{ student[3][1] }}</span><span class="badge" style="olor: white; background-color: #FF9900;">{{ student[3][2] }}</span><span class="badge" style="background-color: #109618; color: white;">{{ student[3][3] }}</span><span class="badge" style="background-color: #990099; color: white;">{{ student[3][4] }}</span>
                 </div>
                 <div id="student{{student_count}}" class="panel-collapse collapse">
                     <table class="table">
                         {% for task in student[2] %}
                         <tr>
                             <td>
-                                <a href='{{ task[1] }}'>{{ task[0] }}</a>
+                                <a href='{{ task[1] }}'>{{ task[0] }}
+                                {% for cat in task[2] %}
+                                    {% if (cat == 1) %}
+                                        <span class="code-badge badge"> </span>
+                                    {% endif %}
+                                    {% if (cat == 2) %}
+                                        <span class="ui-badge badge"> </span>
+                                    {% endif %}
+                                    {% if (cat == 3) %}
+                                        <span class="doc-badge badge"> </span>
+                                    {% endif %}
+                                    {% if (cat == 4) %}
+                                        <span class="qa-badge badge"> </span>
+                                    {% endif %}
+                                    {% if (cat == 5) %}
+                                        <span class="outreach-badge badge"> </span>
+                                    {% endif %}
+                                {% endfor %}</a>
                             </td>
                         </tr>
                         {% endfor %}

@@ -71,26 +71,37 @@ def org_data(orgname):
             tasks.remove(task)
             continue
 
+        cat = task["task_definition"]['categories']
+        code += int(1 in cat)
+        user_interface += int(2 in cat)
+        doc += int(3 in cat)
+        qa += int(4 in cat)
+        outreach += int(5 in cat)
+
         if student_name in s_id:
             student_id = s_id[student_name]
             student_tasks[student_id][0] += 1
-            student_tasks[student_id][2].append([task_name, task_link])
+            student_tasks[student_id][2].append([task_name, task_link, cat])
+            if 1 in cat:
+                student_tasks[student_id][3][0] += 1
+            if 2 in cat:
+                student_tasks[student_id][3][1] += 1
+            if 3 in cat:
+                student_tasks[student_id][3][2] += 1
+            if 4 in cat:
+                student_tasks[student_id][3][3] += 1
+            if 5 in cat:
+                student_tasks[student_id][3][4] += 1
         else:
+            student_code = int(1 in cat)
+            student_ui = int(2 in cat)
+            student_doc = int(3 in cat)
+            student_qa = int(4 in cat)
+            student_out = int(5 in cat)
             s_id[student_name] = last_student_id
-            student_tasks.append([1, student_name, [[task_name, task_link]]])
+            student_tasks.append([1, student_name, [[task_name, task_link, cat]],
+                                  [student_code, student_ui, student_doc, student_qa, student_out]])
             last_student_id += 1
-
-        cat = task["task_definition"]['categories']
-        if 1 in cat:
-            code += 1
-        if 2 in cat:
-            user_interface += 1
-        if 3 in cat:
-            doc += 1
-        if 4 in cat:
-            qa += 1
-        if 5 in cat:
-            outreach += 1
 
     student_tasks = sorted(student_tasks, key=lambda x: x[0], reverse=True)
 
