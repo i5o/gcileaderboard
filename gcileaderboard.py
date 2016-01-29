@@ -27,11 +27,14 @@ task_url = "https://codein.withgoogle.com/tasks/{task_id}/"
 app = Flask(__name__)
 
 orgs = {
-    'apertium': "Apertium",
-    'sugarlabs': "Sugar Labs",
-    'drupal': "Drupal",
-    'fossasia': "FOSSAsia",
-    'ubuntu': "Ubuntu"
+    'apertium': [5149586599444480, "Apertium"],
+    'sugarlabs': [5340425418178560, "Sugar Labs"],
+    'drupal': [4603782423904256, "Drupal"],
+    'fossasia': [4625502878826496, "FOSSAsia"],
+    'ubuntu': [4568116747042816, "Ubuntu"],
+    'haiku': [6583394590785536, "Haiku"],
+    'rtems': [5167877522980864, "RTEMS"],
+    'kde': [6015066264567808, "KDE"]
 }
 
 
@@ -46,7 +49,6 @@ def org_data(orgname):
         data = open(orgname + "_data.json", "r").read()
     except IOError:
         return "<h1>Data for org <i>'%s'</i> not found</h1>" % orgname
-    tasks_count = json.loads(data)["count"]
     tasks = json.loads(data)["results"]
 
     last_student_id = 0
@@ -57,6 +59,11 @@ def org_data(orgname):
         student_name = task["claimed_by"]["display_name"]
         task_name = task["task_definition"]["name"]
         task_link = task_url.format(task_id=task["task_definition_id"])
+        org_id = task["organization_id"]
+
+        if not org_id == orgs[orgname][0]:
+            tasks.remove(task)
+            continue
 
         if student_name in s_id:
             student_id = s_id[student_name]
@@ -77,8 +84,8 @@ def org_data(orgname):
 
     return render_template(
         'org.html',
-        org_name=orgs[orgname],
-        tasks_count=tasks_count,
+        org_name=orgs[orgname][1],
+        tasks_count=len(tasks),
         students=student_tasks)
 
 if __name__ == '__main__':
