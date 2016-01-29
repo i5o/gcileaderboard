@@ -57,8 +57,10 @@
 
 {% block student_chart %}
 <script>
-      google.charts.load("current", {packages:["corechart"]});
-      google.charts.setOnLoadCallback(drawChart);
+    google.charts.load("current", {
+        packages: ["corechart"]
+    });
+    google.charts.setOnLoadCallback(drawChart);
 
 
     function drawChart() {
@@ -67,8 +69,8 @@
             ['Tasks\' category', 'Amount of finished tasks'],
             ['Code', {{ cat_count[0] }}],
             ['User interface', {{ cat_count[1] }}],
-            ['Quality Assurance', {{ cat_count[3] }}],
             ['Documentation', {{ cat_count[2] }}],
+            ['Quality Assurance', {{ cat_count[3] }}],
             ['Outreach/Research', {{ cat_count[4] }}]
         ]);
 
@@ -77,13 +79,17 @@
             pieHole: 0.5,
             backgroundColor: 'transparent',
             pieSliceText: 'value',
-            'chartArea': {'width': '100%', 'height': '80%'},
+            'chartArea': {
+                'width': '100%',
+                'height': '80%'
+            },
         };
 
 
         var chart = new google.visualization.PieChart(document.getElementById('tasksChart'));
         chart.draw(data, options);
         google.visualization.events.addListener(chart, 'select', selectHandler);
+
         function selectHandler() {
             chart.setSelection([])
         }
