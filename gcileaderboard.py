@@ -22,7 +22,7 @@ from flask import render_template
 from flask import redirect
 
 
-task_url = "https://codein.withgoogle.com/tasks/{task_id}/"
+task_url = "https://codein.withgoogle.com/dashboard/task-instances/{task_id}"
 
 app = Flask(__name__)
 
@@ -55,10 +55,16 @@ def org_data(orgname):
     s_id = {}
     student_tasks = []
 
+    code = 0
+    user_interface = 0
+    doc = 0
+    qa = 0
+    outreach = 0
+
     for task in tasks:
         student_name = task["claimed_by"]["display_name"]
         task_name = task["task_definition"]["name"]
-        task_link = task_url.format(task_id=task["task_definition_id"])
+        task_link = task_url.format(task_id=task["id"])
         org_id = task["organization_id"]
 
         if not org_id == orgs[orgname][0]:
@@ -74,6 +80,13 @@ def org_data(orgname):
             student_tasks.append([1, student_name, [[task_name, task_link]]])
             last_student_id += 1
 
+        cat = task["task_definition"]['categories']
+        if 1 in cat: code += 1
+        if 2 in cat: user_interface += 1
+        if 3 in cat: doc += 1
+        if 4 in cat: qa += 1
+        if 5 in cat: outreach += 1
+
     student_tasks = sorted(student_tasks, key=lambda x: x[0], reverse=True)
 
     for key in student_tasks:
@@ -86,7 +99,23 @@ def org_data(orgname):
         'org.html',
         org_name=orgs[orgname][1],
         tasks_count=len(tasks),
-        students=student_tasks)
+        students=student_tasks,
+        cat_count=[code, user_interface, doc, qa, outreach],
+        year=2015)
+
+@app.context_processor
+def utility_processor():
+    def noun_form(num, singular_form, plural_form):
+        if num > 1 or num == 0:
+            return plural_form
+
+        return singular_form
+
+
+    return dict(
+        noun_form=noun_form
+    )
+
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000, threaded=True)
