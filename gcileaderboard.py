@@ -81,11 +81,16 @@ def org_data(orgname):
             last_student_id += 1
 
         cat = task["task_definition"]['categories']
-        if 1 in cat: code += 1
-        if 2 in cat: user_interface += 1
-        if 3 in cat: doc += 1
-        if 4 in cat: qa += 1
-        if 5 in cat: outreach += 1
+        if 1 in cat:
+            code += 1
+        if 2 in cat:
+            user_interface += 1
+        if 3 in cat:
+            doc += 1
+        if 4 in cat:
+            qa += 1
+        if 5 in cat:
+            outreach += 1
 
     student_tasks = sorted(student_tasks, key=lambda x: x[0], reverse=True)
 
@@ -102,19 +107,6 @@ def org_data(orgname):
         students=student_tasks,
         cat_count=[code, user_interface, doc, qa, outreach],
         year=2015)
-
-@app.context_processor
-def utility_processor():
-    def noun_form(num, singular_form, plural_form):
-        if num > 1 or num == 0:
-            return plural_form
-
-        return singular_form
-
-
-    return dict(
-        noun_form=noun_form
-    )
 
 
 if __name__ == '__main__':
