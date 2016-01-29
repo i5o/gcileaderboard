@@ -40,13 +40,13 @@ orgs = {
 
 @app.route('/')
 def start_index():
-    return render_template("index.html")
+    return render_template("2015.html")
 
 
 @app.route('/org/<orgname>/')
 def org_data(orgname):
     try:
-        data = open(orgname + "_data.json", "r").read()
+        data = open("orgs/" + orgname + "_data.json", "r").read()
     except IOError:
         return "<h1>Data for org <i>'%s'</i> not found</h1>" % orgname
     tasks = json.loads(data)["results"]
