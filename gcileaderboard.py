@@ -88,11 +88,11 @@ def org_data(orgname):
             student_tasks[student_id][3][3] += 4 in cat
             student_tasks[student_id][3][4] += 5 in cat
         else:
-            student_code = 1 in cat
-            student_ui = 2 in cat
-            student_doc = 3 in cat
-            student_qa = 4 in cat
-            student_out = 5 in cat
+            student_code = int(1 in cat)
+            student_ui = int(2 in cat)
+            student_doc = int(3 in cat)
+            student_qa = int(4 in cat)
+            student_out = int(5 in cat)
             s_id[student_name] = last_student_id
             student_tasks.append([1, student_name, [[task_name, task_link, cat]],
                                   [student_code, student_ui, student_doc, student_qa, student_out]])
