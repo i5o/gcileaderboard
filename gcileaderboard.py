@@ -37,16 +37,22 @@ orgs = {
     'kde': [6015066264567808, "KDE"]
 }
 
+@app.route("/")
+def test():
+    return render_template("/2015.html")
 
-@app.route('/')
-def start_index():
-    return render_template("2015.html")
+@app.route('/<year>')
+def start_index(year):
+    if year not in ['2010', '2011', '2012', '2013', '2014', '2015']:
+        return render_template("/2015.html")
+
+    return render_template("/%s.html" % year)
 
 
-@app.route('/org/<orgname>/')
-def org_data(orgname):
+@app.route('/<year>/org/<orgname>/')
+def org_data(year, orgname):
     try:
-        data = open("orgs/" + orgname + "_data.json", "r").read()
+        data = open("orgs/" + year + "/" + orgname + "_data.json", "r").read()
     except IOError:
         return "<h1>Data for org <i>'%s'</i> not found</h1>" % orgname
     tasks = json.loads(data)["results"]
@@ -118,7 +124,7 @@ def org_data(orgname):
         tasks_count=len(final_tasks),
         students=student_tasks,
         cat_count=[code, user_interface, doc, qa, outreach, beginner],
-        year=2015)
+        year=year)
 
 
 if __name__ == '__main__':
