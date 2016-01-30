@@ -62,6 +62,13 @@
             margin-left: 2px;
         }
 
+        .beginner-badge {
+            width: 15px;
+            height: 15px;
+            background-color: skyblue;
+            margin-left: 2px;
+        }
+
         .panel-heading {
             cursor: pointer;
         }
@@ -112,6 +119,7 @@
 
         var data = google.visualization.arrayToDataTable([
             ['Tasks\' category', 'Amount of finished tasks'],
+            ['Beginner', {{ cat_count[5] }}],
             ['User interface', {{ cat_count[1] }} ],
             ['Documentation', {{ cat_count[2] }} ],
             ['Quality Assurance', {{ cat_count[3] }} ],
@@ -128,7 +136,7 @@
                 'width': '100%',
                 'height': '80%'
             },
-            colors: ['#990099', '#109618', '#FF9900','#DC3912', '#3366CC']
+            colors: ['skyblue', '#990099', '#109618', '#FF9900','#DC3912', '#3366CC']
         };
 
 
@@ -188,7 +196,11 @@
                                     {% if (cat == 5) %}
                                         <span class="outreach-badge badge"> </span>
                                     {% endif %}
-                                {% endfor %}</a>
+                                {% endfor %}
+                                {% if (task[3] == 1) %}
+                                <span class="beginner-badge badge"> </span>
+                                {% endif %}
+                                    </a>
                             </td>
                         </tr>
                         {% endfor %}

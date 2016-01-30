@@ -53,6 +53,7 @@ def org_data(orgname):
 
     last_student_id = 0
     s_id = {}
+    final_tasks = []
     student_tasks = []
 
     code = 0
@@ -60,16 +61,20 @@ def org_data(orgname):
     doc = 0
     qa = 0
     outreach = 0
+    beginner = 0
 
     for task in tasks:
         student_name = task["claimed_by"]["display_name"]
+        student_id = task["claimed_by"]["id"]
         task_name = task["task_definition"]["name"]
         task_link = task_url.format(task_id=task["id"])
         org_id = task["organization_id"]
 
         if not org_id == orgs[orgname][0]:
-            tasks.remove(task)
             continue
+
+        final_tasks.append(task)
+        is_beginner = int(task["task_definition"]["is_beginner"] == True)
 
         cat = task["task_definition"]['categories']
         code += 1 in cat
@@ -77,11 +82,12 @@ def org_data(orgname):
         doc += 3 in cat
         qa += 4 in cat
         outreach += 5 in cat
+        beginner += is_beginner
 
-        if student_name in s_id:
-            student_id = s_id[student_name]
+        if student_id in s_id:
+            student_id = s_id[student_id]
             student_tasks[student_id][0] += 1
-            student_tasks[student_id][2].append([task_name, task_link, cat])
+            student_tasks[student_id][2].append([task_name, task_link, cat, is_beginner])
             student_tasks[student_id][3][0] += 1 in cat
             student_tasks[student_id][3][1] += 2 in cat
             student_tasks[student_id][3][2] += 3 in cat
@@ -93,8 +99,8 @@ def org_data(orgname):
             student_doc = int(3 in cat)
             student_qa = int(4 in cat)
             student_out = int(5 in cat)
-            s_id[student_name] = last_student_id
-            student_tasks.append([1, student_name, [[task_name, task_link, cat]],
+            s_id[student_id] = last_student_id
+            student_tasks.append([1, student_name, [[task_name, task_link, cat, is_beginner]],
                                   [student_code, student_ui, student_doc, student_qa, student_out]])
             last_student_id += 1
 
@@ -109,9 +115,9 @@ def org_data(orgname):
     return render_template(
         'org.html',
         org_name=orgs[orgname][1],
-        tasks_count=len(tasks),
+        tasks_count=len(final_tasks),
         students=student_tasks,
-        cat_count=[code, user_interface, doc, qa, outreach],
+        cat_count=[code, user_interface, doc, qa, outreach, beginner],
         year=2015)
 
 
