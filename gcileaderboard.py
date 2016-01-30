@@ -61,13 +61,69 @@ def org_year_data(year, orgname):
     if year not in ['2010', '2011', '2012', '2013', '2014']:
         return render_template("/index.html")
 
+    org_title = GCI.get_org_name(int(year), orgname)
+    tags = GCI.get_tasks_count(int(year), orgname)
+    tasks = GCI.get_tasks(int(year), orgname)
+
+    model_tags = [
+        tags['Code'],
+        tags['User Interface'],
+        tags['Documentation/Training'],
+        tags['Quality Assurance'],
+        tags['Outreach/Research']
+    ]
+
+    student_total_tasks = []
+    pos = -1
+    last_student = None
+
+    for student in tasks['userTasks']:
+        student_name = student[0]
+
+        if last_student != student_name:
+            last_student = student_name
+            student_total_tasks.append([0, student_name, []])
+            pos += 1
+
+        student = GCI.get_student_tasks(student_name, int(year), orgname)
+        student_tasks = student['tasks']
+
+        for task in student_tasks:
+            task = student_tasks[task]
+            task_name = task['title']
+            task_link = task['link']
+
+            student_total_tasks[pos][0] += 1
+            student_total_tasks[pos][2].append(
+                [task_name, task_link])
+
+    student_total_tasks = sorted(
+        student_total_tasks,
+        key=lambda x: x[0],
+        reverse=True)
+    for key in student_total_tasks:
+        key = student_total_tasks.index(key)
+        tasks_ = student_total_tasks[key][2]
+        sorted_tasks = sorted(tasks_, key=lambda x: x[0], reverse=False)
+        student_total_tasks[key][2] = sorted_tasks
+
+    return render_template(
+        'org_old.html',
+        org_name=org_title,
+        tasks_count=tasks["totalTasks"],
+        students=student_total_tasks,
+        cat_count=model_tags,
+        year=year)
+
+    return org_title
+
 
 @app.route('/2015/org/<orgname>/')
 def org_2015_data(orgname):
     try:
         data = open("orgs/2015/" + orgname + "_data.json", "r").read()
     except IOError:
-        return "<h1>Data for org <i>'%s'</i> not found</h1>" % orgname
+        return redirect("/2015")
     tasks = json.loads(data)["results"]
 
     last_student_id = 0

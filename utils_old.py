@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Google Code-In unofficial leaderboard utils file
-# Copyright (C) 2013-2015 Ignacio Rodríguez <ignacio@sugarlabs.org>
+# Copyright (C) Ignacio Rodríguez <ignacio@sugarlabs.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ class GCIUtils():
             'total_tags': {
                 'User Interface': 0,
                 'Code': 0,
-                'Documentation/Training': 6,
+                'Documentation/Training': 0,
                 'Outreach/Research': 0,
                 'Quality Assurance': 0},
             'tasks': {}}

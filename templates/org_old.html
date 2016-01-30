@@ -27,48 +27,6 @@
             margin-left: 2px;
         }
 
-        .code-badge {
-            width: 15px;
-            height: 15px;
-            background-color: #3366CC;
-            margin-left: 2px;
-        }
-
-        .ui-badge {
-            width: 15px;
-            height: 15px;
-            background-color: #DC3912;
-            margin-left: 2px;
-        }
-
-        .qa-badge {
-            width: 15px;
-            height: 15px;
-            background-color: #109618;
-            margin-left: 2px;
-        }
-
-        .doc-badge {
-            width: 15px;
-            height: 15px;
-            background-color: #FF9900;
-            margin-left: 2px;
-        }
-
-        .outreach-badge {
-            width: 15px;
-            height: 15px;
-            background-color: #990099;
-            margin-left: 2px;
-        }
-
-        .beginner-badge {
-            width: 15px;
-            height: 15px;
-            background-color: skyblue;
-            margin-left: 2px;
-        }
-
         .panel-heading {
             cursor: pointer;
         }
@@ -119,12 +77,11 @@
 
         var data = google.visualization.arrayToDataTable([
             ['Tasks\' category', 'Amount of finished tasks'],
-            ['Beginner', {{ cat_count[5] }}],
             ['User interface', {{ cat_count[1] }} ],
             ['Documentation', {{ cat_count[2] }} ],
             ['Quality Assurance', {{ cat_count[3] }} ],
             ['Outreach/Research', {{ cat_count[4] }} ],
-            ['Code', {{ cat_count[0] }} ]
+            ['Code', {{ cat_count [0] }}]
         ]);
 
         var options = {
@@ -136,7 +93,8 @@
                 'width': '100%',
                 'height': '80%'
             },
-            colors: ['skyblue', '#990099', '#109618', '#FF9900','#DC3912', '#3366CC']
+            sliceVisibilityThreshold:0,
+            colors: ['#990099', '#109618', '#FF9900','#DC3912', '#3366CC']
         };
 
 
@@ -172,35 +130,14 @@
             <div class="panel panel-success" id="panel{{student_count}}">
                 <div class="panel-heading" data-toggle="collapse" data-icon="{{student_count}}" href="#student{{student_count}}">
                     <a href="#"><span class="glyphicon glyphicon-chevron-right rotate more_icon" id="moreIcon{{student_count}}"></span></a>
-                    </span>{{ student[1] }}<span class="badge">{{ student[2]|length }} task{% if (student[2]|length > 1) %}s{% endif %}</span><span class="badge" style="background-color: #3366CC; color: white;">{{ student[3][0] }}</span><span class="badge" style="background-color: #DC3912; color: white;">{{ student[3][1] }}</span><span class="badge" style="olor: white; background-color: #FF9900;">{{ student[3][2] }}</span><span class="badge" style="background-color: #109618; color: white;">{{ student[3][3] }}</span><span class="badge" style="background-color: #990099; color: white;">{{ student[3][4] }}</span>
+                    </span>{{ student[1] }}<span class="badge">{{ student[2]|length }} task{% if (student[2]|length > 1) %}s{% endif %}</span>
                 </div>
                 <div id="student{{student_count}}" class="panel-collapse collapse">
                     <table class="table">
                         {% for task in student[2] %}
                         <tr>
                             <td>
-                                <a href='{{ task[1] }}'>{{ task[0] }}
-                                {% for cat in task[2] %}
-                                    {% if (cat == 1) %}
-                                        <span class="code-badge badge"> </span>
-                                    {% endif %}
-                                    {% if (cat == 2) %}
-                                        <span class="ui-badge badge"> </span>
-                                    {% endif %}
-                                    {% if (cat == 3) %}
-                                        <span class="doc-badge badge"> </span>
-                                    {% endif %}
-                                    {% if (cat == 4) %}
-                                        <span class="qa-badge badge"> </span>
-                                    {% endif %}
-                                    {% if (cat == 5) %}
-                                        <span class="outreach-badge badge"> </span>
-                                    {% endif %}
-                                {% endfor %}
-                                {% if (task[3] == 1) %}
-                                <span class="beginner-badge badge"> </span>
-                                {% endif %}
-                                    </a>
+                                <a href='{{ task[1] }}'>{{ task[0] }}</a>
                             </td>
                         </tr>
                         {% endfor %}
