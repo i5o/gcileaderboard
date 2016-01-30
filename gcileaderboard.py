@@ -21,6 +21,9 @@ from flask import Flask
 from flask import render_template
 from flask import redirect
 
+from utils_old import *
+
+GCI = GCIUtils()
 
 task_url = "https://codein.withgoogle.com/dashboard/task-instances/{task_id}"
 
@@ -37,22 +40,32 @@ orgs = {
     'kde': [6015066264567808, "KDE"]
 }
 
+
 @app.route("/")
 def test():
-    return render_template("/2015.html")
+    return render_template("/index.html")
 
+
+@app.route('/<year>/')
 @app.route('/<year>')
 def start_index(year):
+    print year
     if year not in ['2010', '2011', '2012', '2013', '2014', '2015']:
-        return render_template("/2015.html")
+        return redirect("/")
 
     return render_template("/%s.html" % year)
 
 
 @app.route('/<year>/org/<orgname>/')
-def org_data(year, orgname):
+def org_year_data(year, orgname):
+    if year not in ['2010', '2011', '2012', '2013', '2014']:
+        return render_template("/index.html")
+
+
+@app.route('/2015/org/<orgname>/')
+def org_2015_data(orgname):
     try:
-        data = open("orgs/" + year + "/" + orgname + "_data.json", "r").read()
+        data = open("orgs/2015/" + orgname + "_data.json", "r").read()
     except IOError:
         return "<h1>Data for org <i>'%s'</i> not found</h1>" % orgname
     tasks = json.loads(data)["results"]
@@ -80,7 +93,7 @@ def org_data(year, orgname):
             continue
 
         final_tasks.append(task)
-        is_beginner = int(task["task_definition"]["is_beginner"] == True)
+        is_beginner = int(task["task_definition"]["is_beginner"])
 
         cat = task["task_definition"]['categories']
         code += 1 in cat
@@ -93,21 +106,23 @@ def org_data(year, orgname):
         if student_id in s_id:
             student_id = s_id[student_id]
             student_tasks[student_id][0] += 1
-            student_tasks[student_id][2].append([task_name, task_link, cat, is_beginner])
+            student_tasks[student_id][2].append(
+                [task_name, task_link, cat, is_beginner])
             student_tasks[student_id][3][0] += 1 in cat
             student_tasks[student_id][3][1] += 2 in cat
             student_tasks[student_id][3][2] += 3 in cat
             student_tasks[student_id][3][3] += 4 in cat
             student_tasks[student_id][3][4] += 5 in cat
         else:
-            student_code = int(1 in cat)
-            student_ui = int(2 in cat)
-            student_doc = int(3 in cat)
-            student_qa = int(4 in cat)
-            student_out = int(5 in cat)
+            s_code = int(1 in cat)
+            s_ui = int(2 in cat)
+            s_doc = int(3 in cat)
+            s_qa = int(4 in cat)
+            s_out = int(5 in cat)
             s_id[student_id] = last_student_id
-            student_tasks.append([1, student_name, [[task_name, task_link, cat, is_beginner]],
-                                  [student_code, student_ui, student_doc, student_qa, student_out]])
+            student_tasks.append([1, student_name,
+                                  [[task_name, task_link, cat, is_beginner]],
+                                  [s_code, s_ui, s_doc, s_qa, s_out]])
             last_student_id += 1
 
     student_tasks = sorted(student_tasks, key=lambda x: x[0], reverse=True)
@@ -124,8 +139,12 @@ def org_data(year, orgname):
         tasks_count=len(final_tasks),
         students=student_tasks,
         cat_count=[code, user_interface, doc, qa, outreach, beginner],
-        year=year)
+        year=2015)
 
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect("/")
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000, threaded=True)
