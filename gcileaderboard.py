@@ -16,7 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import json
-
+from functools import wraps
+from flask import request
+from flask import Response
 from flask import Flask
 from flask import render_template
 from flask import redirect
@@ -49,8 +51,7 @@ def test():
 @app.route('/<year>/')
 @app.route('/<year>')
 def start_index(year):
-    print year
-    if year not in ['2010', '2011', '2012', '2013', '2014', '2015']:
+    if year not in ['2010', '2011', '2012', '2013', '2014', '2015', '2016']:
         return redirect("/")
 
     return render_template("/%s.html" % year)
@@ -120,10 +121,11 @@ def org_year_data(year, orgname):
 
 @app.route('/2015/org/<orgname>/')
 def org_2015_data(orgname):
+    year = "2015"
     try:
-        data = open("orgs/2015/" + orgname + "_data.json", "r").read()
+        data = open("orgs/" + year + "/" + orgname + "_data.json", "r").read()
     except IOError:
-        return redirect("/2015")
+        return redirect("/" + year)
     tasks = json.loads(data)["results"]
 
     last_student_id = 0
@@ -196,6 +198,88 @@ def org_2015_data(orgname):
         students=student_tasks,
         cat_count=[code, user_interface, doc, qa, outreach, beginner],
         year=2015)
+
+
+@app.route('/2016/org/<orgname>/')
+def org_2016_data(orgname):
+    year = "2016"
+    try:
+        data = open("orgs/" + year + "/" + orgname + "_data.json", "r").read()
+    except IOError:
+        return redirect("/" + year)
+    tasks = json.loads(data)["results"]
+
+    last_student_id = 0
+    s_id = {}
+    final_tasks = []
+    student_tasks = []
+
+    code = 0
+    user_interface = 0
+    doc = 0
+    qa = 0
+    outreach = 0
+    beginner = 0
+
+    for task in tasks:
+        student_name = task["claimed_by"]["display_name"]
+        student_id = task["claimed_by"]["id"]
+        task_name = task["task_definition"]["name"]
+        task_link = task_url.format(task_id=task["id"])
+        org_id = task["organization_id"]
+
+        # if not org_id == orgs[orgname][0]:
+        #    continue
+        orgs[org_id] = "Sugar Labs"
+
+        final_tasks.append(task)
+        is_beginner = int(task["task_definition"]["is_beginner"])
+
+        cat = task["task_definition"]['categories']
+        code += 1 in cat
+        user_interface += 2 in cat
+        doc += 3 in cat
+        qa += 4 in cat
+        outreach += 5 in cat
+        beginner += is_beginner
+
+        if student_id in s_id:
+            student_id = s_id[student_id]
+            student_tasks[student_id][0] += 1
+            student_tasks[student_id][2].append(
+                [task_name, task_link, cat, is_beginner])
+            student_tasks[student_id][3][0] += 1 in cat
+            student_tasks[student_id][3][1] += 2 in cat
+            student_tasks[student_id][3][2] += 3 in cat
+            student_tasks[student_id][3][3] += 4 in cat
+            student_tasks[student_id][3][4] += 5 in cat
+        else:
+            s_code = int(1 in cat)
+            s_ui = int(2 in cat)
+            s_doc = int(3 in cat)
+            s_qa = int(4 in cat)
+            s_out = int(5 in cat)
+            s_id[student_id] = last_student_id
+            student_tasks.append([1, student_name,
+                                  [[task_name, task_link, cat, is_beginner]],
+                                  [s_code, s_ui, s_doc, s_qa, s_out]])
+            last_student_id += 1
+
+    student_tasks = sorted(student_tasks, key=lambda x: x[0], reverse=True)
+
+    for key in student_tasks:
+        key = student_tasks.index(key)
+        tasks_ = student_tasks[key][2]
+        sorted_tasks = sorted(tasks_, key=lambda x: x[0], reverse=False)
+        student_tasks[key][2] = sorted_tasks
+
+    return render_template(
+        'org.html',
+        org_name=orgs[orgname][1],
+        tasks_count=len(final_tasks),
+        students=student_tasks,
+        cat_count=[code, user_interface, doc, qa, outreach, beginner],
+        year=2016)
 
 
 @app.errorhandler(404)
