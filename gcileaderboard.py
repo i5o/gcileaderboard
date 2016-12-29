@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import json
-from functools import wraps
+import time
+import os.path
 from flask import request
-from flask import Response
 from flask import Flask
 from flask import render_template
 from flask import redirect
@@ -123,7 +123,9 @@ def org_year_data(year, orgname):
 def org_2015_data(orgname):
     year = "2015"
     try:
-        data = open("orgs/" + year + "/" + orgname + "_data.json", "r").read()
+        file_path = "orgs/" + year + "/" + orgname + "_data.json"
+        data = open(file_path).read()
+        last_update_time = time.ctime(os.path.getmtime(file_path))
     except IOError:
         return redirect("/" + year)
     tasks = json.loads(data)["results"]
@@ -197,14 +199,17 @@ def org_2015_data(orgname):
         tasks_count=len(final_tasks),
         students=student_tasks,
         cat_count=[code, user_interface, doc, qa, outreach, beginner],
-        year=2015)
+        year=2015,
+        last_update_time=last_update_time)
 
 
 @app.route('/2016/org/<orgname>/')
 def org_2016_data(orgname):
     year = "2016"
     try:
-        data = open("orgs/" + year + "/" + orgname + "_data.json", "r").read()
+        file_path = "orgs/" + year + "/" + orgname + "_data.json"
+        data = open(file_path).read()
+        last_update_time = time.ctime(os.path.getmtime(file_path))
     except IOError:
         return redirect("/" + year)
     tasks = json.loads(data)["results"]
@@ -279,7 +284,8 @@ def org_2016_data(orgname):
         tasks_count=len(final_tasks),
         students=student_tasks,
         cat_count=[code, user_interface, doc, qa, outreach, beginner],
-        year=2016)
+        year=2016,
+        last_update_time=last_update_time)
 
 
 @app.errorhandler(404)
